@@ -1,1 +1,1 @@
-print("Creating discord bot.")
+print("Creating discord-bot.")
