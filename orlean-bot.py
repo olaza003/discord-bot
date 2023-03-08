@@ -1,16 +1,37 @@
+import json
 import discord 
+import responses
 from discord.ext import commands 
 
 intents = discord.Intents.default()
-client = discord.Client(intents=intents, ssl=False)
+intents.message_content = True
+#client = discord.Client(intents=intents, ssl=False)
+client = discord.Client(intents=discord.Intents.default())
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-@bot.event
+
+@client.event
 async def on_ready():
-    print('Bot is ready!')
+    print('We have logged in as {0.user}'.format(client))
 
-@bot.command()
-async def hello(ctx):
-    await ctx.send('Hello!')
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
 
-bot.run('OTQzNzg0Mzk1MTkyNTYxNzA1.GKOdDf.eotOpoU20x1a0aLhj6zbw9i9hXHLkHKKo6eGQM')
+    username = str(message.author)
+    user_message = str(message.content)
+    channel = str(message.channel)
+
+    print(f"{username} said: '{user_message}' ({channel})")
+
+    if user_message == 'hello':
+        response = responses.handle_response("HELLO!!")
+        await message.author.send(response)
+
+with open('config.json') as f:
+    data = json.load(f)
+
+token = data['token']
+
+client.run(token)
