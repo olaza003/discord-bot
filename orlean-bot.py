@@ -34,4 +34,4 @@ with open('config.json') as f:
 
 token = data['token']
 
-client.run(token)
+client.run(token) 
