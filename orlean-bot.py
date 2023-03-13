@@ -1,12 +1,12 @@
 import json
 import discord 
-import responses
 from discord.ext import commands 
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.messages=True
 #client = discord.Client(intents=intents, ssl=False)
-client = discord.Client(intents=discord.Intents.default())
+client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 
@@ -26,8 +26,8 @@ async def on_message(message):
     print(f"{username} said: '{user_message}' ({channel})")
 
     if user_message == 'hello':
-        response = responses.handle_response("HELLO!!")
-        await message.author.send(response)
+        response = "HELLO!!"
+        await message.channel.send(response) #if is_private else await message.channel.send(response)
 
 with open('config.json') as f:
     data = json.load(f)
