@@ -1,5 +1,8 @@
+from ast import Not
 import json
+from urllib import response
 import discord 
+from tictactoe import *
 from discord.ext import commands 
 
 intents = discord.Intents.default()
@@ -8,6 +11,7 @@ intents.messages=True
 #client = discord.Client(intents=intents, ssl=False)
 client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix='!', intents=intents)
+game = None
 
 
 @client.event
@@ -16,18 +20,55 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    global game
+
     if message.author == client.user:
         return
+    if game is not None:
+        await message.channel.send(f'Player {game.playerVal + 1} turn')
 
-    username = str(message.author)
-    user_message = str(message.content)
-    channel = str(message.channel)
+    if str(message.content) == '!startgame':
+        if game is not None:
+            await message.channel.send('a game is in progress!!!')
+        else:
+            game = tictactoe()
+            await message.channel.send('Starting new game')
+            await message.channel.send('Enter value starting from 1 - 9')
+            #game.gameRunning()
+    elif game is not None and message.content.isdigit():
+        player_input = int(message.content)
+        
+        if game.playerInputs(player_input): # if input is valid
+            await message.channel.send(game.printBoard())
+            if game.gameWin(): #check win status
+                await message.channel.send(f"Player {game.playerVal + 1} WINS!!!")
+                game.resetGame()
+                game = None
+            elif game.gameTie():
+                await message.channel.send("Game Tied, No One Wins")
+                game.resetGame()
+                game = None
+            game.changePlayer()
+        else:
+            await message.channel.send('Invalid input')
+            await message.channe.send(f"waiting for player {game.playerVal + 1}'s turn")
 
-    print(f"{username} said: '{user_message}' ({channel})")
+    elif game is not None and str(message.content) == '!endgame':
+        game.resetGame()
+        game = None
+        await message.channel.send("game has terminated")
 
-    if user_message == 'hello':
-        response = "HELLO!!"
-        await message.channel.send(response) #if is_private else await message.channel.send(response)
+        
+    #username = str(message.author)
+    #user_message = str(message.content)
+    #channel = str(message.channel)
+    
+    #print(f"{username} said: '{user_message}' ({channel})")
+
+    #if user_message == 'hello':
+        #response = "HELLO!!"
+        #await message.channel.send(response) #if is_private else await message.channel.send(response)
+        
 
 with open('config.json') as f:
     data = json.load(f)

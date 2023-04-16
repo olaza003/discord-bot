@@ -2,6 +2,9 @@
 # tictactoe game -> utilize discord to play after this project is utilize
 
 #create board
+from operator import truediv
+
+
 class tictactoe(object):
     board = [[None, None, None ],
             [None, None, None],
@@ -41,11 +44,22 @@ class tictactoe(object):
         col = inp % 3
         if inp >= 0 and inp < 9 and self.board[row][col] == None:
             self.board[row][col] = self.player[self.playerVal]
+            self.inputs += 1
             return True
 
         print("invalid input!")
         return False
 
+    def playerInputs(self, num): # 1 - 9 with input
+        inp = num  - 1
+        row = inp // 3 
+        col = inp % 3
+        if inp >= 0 and inp < 9 and self.board[row][col] == None:
+            self.board[row][col] = self.player[self.playerVal]
+            return True
+
+        print("invalid input!")
+        return False
 
     #check if win or tie: 
     #   utilize checker
@@ -65,7 +79,8 @@ class tictactoe(object):
                     strBoard += "\n"
             if i < 2:
                 strBoard += "-------------\n"
-        print(strBoard) 
+        print(strBoard)
+        return strBoard
 
     def changePlayer(self): 
         if self.playerVal == 0:
@@ -75,7 +90,20 @@ class tictactoe(object):
 
     def gameWin(self):
         if self.checkDiagonal() or self.checkHorizontal() or self.checkVertical():
+            return True
+        return False
+
+    def gameTie(self):
+        if self.inputs == 9:
+            return True
+        return False
+
+    def gameStatus(self):
+        if self.gameWin():
             print(f"Player {self.player[self.playerVal]} win")
+            return True
+        if self.gameTie():
+            print('Game tied!!! No One WINS!!!')
             return True
         return False
 
@@ -87,13 +115,16 @@ class tictactoe(object):
             while playInput is False:
                 playInput = self.playerInput()
             self.printBoard()
-            validator = self.gameWin()
+            validator = self.gameStatus()
             self.changePlayer()
         self.resetGame()
+
         print("reset game")
 
     def resetGame(self):
         self.board = [[None for _ in range(len(self.board[0]))] for _ in range(len(self.board))]
+        self.inputs = 0
+        self.playerVal = 0
     
 
 
