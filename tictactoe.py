@@ -120,11 +120,16 @@ class tictactoe(object):
         self.resetGame()
 
         print("reset game")
+    
+    #adding AI
+    def AIMove(self):
+        return
 
     def resetGame(self):
         self.board = [[None for _ in range(len(self.board[0]))] for _ in range(len(self.board))]
         self.inputs = 0
         self.playerVal = 0
+    
     
 
 

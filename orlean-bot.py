@@ -12,6 +12,8 @@ intents.messages=True
 client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix='!', intents=intents)
 game = None
+players = []
+startValid = False
 
 
 @client.event
@@ -20,7 +22,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global game
+    global game, startValid
 
     if message.author == client.user:
         return
@@ -33,9 +35,19 @@ async def on_message(message):
         else:
             game = tictactoe()
             await message.channel.send('Starting new game')
-            await message.channel.send('Enter value starting from 1 - 9')
+            await message.channel.send('Player 2 go ahead and type \'!AddMe\' to include 2nd player')
+            players.append(str(message.author))
+            #await message.channel.send('Enter value starting from 1 - 9')
             #game.gameRunning()
-    elif game is not None and message.content.isdigit():
+    elif game is not None and not startValid and str(message.content) == '!AddMe':
+        print(players)
+        if str(message.author) in players:
+            await message.channel.send('player is already in the game')
+        else:
+            startValid = True
+            await message.channel.send('Adding second player')
+            players.append(message.author)
+    elif game is not None and startValid and message.content.isdigit():
         player_input = int(message.content)
         
         if game.playerInputs(player_input): # if input is valid
