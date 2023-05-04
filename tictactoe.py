@@ -3,6 +3,7 @@
 
 #create board
 from operator import truediv
+import math
 
 
 class tictactoe(object):
@@ -121,19 +122,86 @@ class tictactoe(object):
 
         print("reset game")
     
-    #adding AI
+    #adding AI with MinMax algorithm
     def AIMove(self):
-        return
+        bestScore = -math.inf
+        bestMove = None
+        for i in range(3):
+            for k in range(3):
+                if self.board[i][k] is None:
+                    self.board[i][k] = self.player[1]
+                    score = self.minimax(0, self.playerVal == 1)
+                    self.board[i][k] = None
+                    if score > bestScore:
+                        bestScore = score
+                        bestMove = (i,k)
+        if bestMove is not None:
+            self.board[bestMove[0]][bestMove[1]] = self.player[1]
+        else:
+            print("Game tied!!! No One WINS!!!")
+
+    def minimax(self, depth, isMaximizing):
+        if self.gameWin():
+            if self.playerVal == 1:
+                return 1
+            else:
+                return -1
+        if self.gameTie():
+            return 0
+        if isMaximizing:
+            bestScore = float('-inf')
+            for i in range(3):
+                for k in range(3):
+                    if self.board[i][k] is None:
+                        self.board[i][k] = self.player[1]
+                        score = self.minimax(depth+1, not isMaximizing)
+                        self.board[i][k] = None
+                        bestScore = max(score, bestScore)
+            return bestScore
+        else:
+            bestScore = float('inf')
+            for i in range(3):
+                for k in range(3):
+                    if self.board[i][k] is None:
+                        self.board[i][k] = self.player[0]
+                        score = self.minimax(depth+1, not isMaximizing)
+                        self.board[i][k] = None
+                        bestScore = min(score, bestScore)
+            return bestScore
 
     def resetGame(self):
         self.board = [[None for _ in range(len(self.board[0]))] for _ in range(len(self.board))]
         self.inputs = 0
         self.playerVal = 0
     
-    
+    def AIGameplay(self):
+        self.printBoard()
+        validator, currPlayer = False, False
+        while validator is False:
+            if currPlayer is False:
+                playerInput = self.playerInput()
+                while playerInput is False:
+                    playerInput = self.playerInput()
+            else:
+                playerInput = self.AIMove()
+            self.printBoard()
+            if self.gameTie() or self.gameWin():
+                validator = True
+                if currPlayer:
+                    print('AI wins!!!')
+                else:
+                    print('You win')
+            currPlayer = not currPlayer
+        self.resetGame()
+        print('Reset game')
+
 
 
 if __name__ == '__main__':
     play = tictactoe()
-    play.gameRunning()
+    gameMode = input('1 vs 1 : (1) or VS. AI (2)')
+    if gameMode == 1:
+        play.gameRunning()
+    else:
+        play.AIGameplay()
     print("test")
